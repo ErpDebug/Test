@@ -95,6 +95,7 @@
     <div id="score"></div>
     <div id="estimated-IQ"></div>
     <button onclick="goBack()" class="button back-button">Back to Quiz</button>
+	<button onclick="nextQuiz()" class="button next-button">Next Quiz</button>
 </div>
 
 <script>
@@ -193,7 +194,10 @@
         score = 0;
         loadQuestion();
     }
-
+	 function nextQuiz() {
+        window.location.href = "Career_path.html";  // Redirect to the career path page
+    }
+	
     // Initializing the quiz
     loadQuestion();
 </script>
