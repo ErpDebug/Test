@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student IQ Test</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .container {
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .choices {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .choices li {
+            background-color: #f8f8f8;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .choices li:hover {
+            background-color: #ddd;
+        }
+
+        #result-page {
+            display: none;
+            text-align: center;
+        }
+
+        #score {
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        #estimated-IQ {
+            font-size: 20px;
+            color: #555;
+        }
+
+        .back-button {
+            background-color: #f44336;
+        }
+
+        .back-button:hover {
+            background-color: #e53935;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-container">
+    <h1>IQ Test</h1>
+    <div id="question-container">
+        <div class="question" id="question-text"></div>
+        <ul class="choices" id="choices-list"></ul>
+    </div>
+</div>
+
+<div class="container" id="result-page">
+    <h1>Results</h1>
+    <div id="score"></div>
+    <div id="estimated-IQ"></div>
+    <button onclick="goBack()" class="button back-button">Back to Quiz</button>
+</div>
+
+<script>
+    const questions = [
+        { question: "If a car travels at 60 mph for 3 hours, how far does it travel?", choices: ["120 miles", "180 miles", "240 miles", "300 miles"], correctAnswer: "180 miles" }, 
+		{ question: "What is the next number in the sequence: 2, 4, 8, 16, ...?", choices: ["24", "32", "64", "128"], correctAnswer: "32" }, 
+		{ question: "Solve for x: 2x + 5 = 11", choices: ["2", "3", "4", "5"], correctAnswer: "3" }, 
+		{ question: "If all dogs are animals, and all animals eat, do all dogs eat?", choices: ["Yes", "No", "Cannot be determined"], correctAnswer: "Yes" }, 
+		{ question: "Complete the analogy: Hot is to Cold as Wet is to ...?", choices: ["Dry", "Cold", "Warm", "Soft"], correctAnswer: "Dry" }, 
+		{ question: "A clock shows 9:30. What time will it be 4 hours later?", choices: ["1:30", "2:30", "11:30", "13:30"], correctAnswer: "1:30" }, 
+		{ question: "If a word is rearranged to form a new word, what is it called?", choices: ["Synonym", "Antonym", "Anagram", "Palindrome"], correctAnswer: "Anagram" }, 
+		{ question: "What is the square root of 144?", choices: ["10", "12", "14", "16"], correctAnswer: "12" }, 
+		{ question: "Which shape has five sides?", choices: ["Square", "Triangle", "Pentagon", "Hexagon"], correctAnswer: "Pentagon" }, 
+		{ question: "If it takes 5 minutes to boil an egg, how long does it take to boil 5 eggs?", choices: ["5 minutes", "10 minutes", "25 min	utes", "50 minutes"], correctAnswer: "5 minutes" }, 
+		{ question: "What is the opposite of generous?", choices: ["Kind", "Happy", "Greedy", "Friendly"], correctAnswer: "Greedy" }, 
+		{ question: "Which word best completes the sentence: 'The rain fell _____.'", choices: ["Loudly", "Softly", "Quickly", "Beautifully"], correctAnswer: "Softly" }, 
+		{ question: "If a day is 24 hours, how many hours are there in 3 days?", choices: ["48 hours", "72 hours", "96 hours", "120 hours"], correctAnswer: "72 hours" }, 
+		{ question: "What is the capital of France?", choices: ["Berlin", "London", "Paris", "Madrid"], correctAnswer: "Paris" }, 
+		{ question: "Which planet is closest to the Sun?", choices: ["Earth", "Mars", "Venus", "Jupiter"], correctAnswer: "Venus" }, 
+		{ question: "If a rectangle has a length of 8 cm and a width of 5 cm, what is its area?", choices: ["13 cm²", "26 cm²", "32 cm²", "40 cm²"], correctAnswer: "40 cm²" }, 
+		{ question: "Which word best describes a person who tells the truth?", choices: ["Honest", "Brave", "Smart", "Funny"], correctAnswer: "Honest" }, 
+		{ question: "What is the sum of 15 and 23?", choices: ["36", "38", "40", "42"], correctAnswer: "38" }, 
+		{ question: "What is the main function of the heart?", choices: ["To digest food", "To control breathing", "To pump blood", "To regulate temperature"], correctAnswer: "To pump blood" }, 
+		{ question: "In a group of 25 people, 15 like coffee and 12 like tea. If 7 people like both coffee and tea, how many people like neither coffee nor tea?", choices: ["3", "5", "7", "9"], correctAnswer: "3" }, 
+		{ question: "All birds can fly. Tweety is a bird. Can Tweety fly?", choices: ["Yes", "No", "Cannot be determined"], correctAnswer: "Cannot be determined" }, 
+		{ question: "Three people check into a hotel. They pay $30 to the manager and rent a room for $30. The manager later realizes that the room rate is only $25 and gives the bellhop $5 to return to the guests. The bellhop decides to keep $2 for himself and only gives $3 to the guests. Therefore, the guests each paid $9 and the bellhop kept $2. This totals $29. Where is the missing dollar?", choices: ["There is no missing dollar", "The hotel lost $1", "The guests were overcharged", "The bellhop stole $1"], correctAnswer: "There is no missing dollar" }, 
+		{ question: "If you fold the following shape, which cube would it form? (You would need to provide a 2D net of a cube here)", choices: ["Cube A", "Cube B", "Cube C", "Cube D"], correctAnswer: "Cube A" }, 
+		{ question: "Hot is to Cold as Wet is to _____.", choices: ["Dry", "Cold", "Warm", "Soft"], correctAnswer: "Dry" }, 
+		{ question: "A farmer needs to transport a wolf, a goat, and a cabbage across a river. He has a small boat that can only carry him and one other thing at a time. He cannot leave the wolf alone with the goat (the wolf will eat the goat) or the goat alone with the cabbage (the goat will eat the cabbage). How does he get everything across the river safely?", choices: ["Take the goat first", "Take the wolf first", "Take the cabbage first", "The farmer cannot solve this problem"], correctAnswer: "Take the goat first" }, 
+		{ question: "Which word does not belong with the others?", choices: ["Circle", "Square", "Triangle", "Rectangle"], correctAnswer: "Circle" }, 
+		{ question: "You have $100 to invest. You can choose between two options: Option A: Guaranteed return of $110 after one year. Option B: 50% chance of earning $200 and 50% chance of losing all your money. Which option would you choose and why?", choices: ["Option A", "Option B", "Neither", "It depends on risk tolerance"], correctAnswer: "It depends on risk tolerance" }, 
+		{ question: "Is the following argument valid? 'All cats are mammals. Fluffy is a mammal. Therefore, Fluffy is a cat.'", choices: ["Valid", "Invalid", "Cannot be determined"], correctAnswer: "Invalid" }, 
+		{ question: "The statement 'Students who study hard get good grades' assumes that:", choices: ["Studying hard is the only factor", "All students study hard", "Good grades are the only measure of success", "Teachers are good"], correctAnswer: "Studying hard is the only factor" }, 
+		{ question: "What is the difference between software and hardware?", choices: ["Software is physical, hardware is intangible", "Software is intangible (programs), hardware is physical (components)", "Software is for games, hardware is for work"], correctAnswer: "Software is intangible (programs), hardware is physical (components)" }, 
+		{ question: "What is the largest ocean on Earth?", choices: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"], correctAnswer: "Pacific Ocean" }, 
+		{ question: "What is the next number in the sequence: 1, 4, 9, 16, 25, ...?", choices: ["34", "35", "36", "37"], correctAnswer: "36" }, 
+		{ question: "The average of four numbers is 15. Three of the numbers are 12, 18, and 10. What is the fourth number?", choices: ["10", "15", "20", "25"], correctAnswer: "20" }, 
+		{ question: "If the ratio of boys to girls in a class is 3:2 and there are 15 boys, how many girls are there?", choices: ["5", "10", "15", "20"], correctAnswer: "10" },
+		{ question: "If a tree falls in a forest and no one is around to hear it, does it make a sound?", choices: ["Yes", "No", "It depends on the definition of sound", "Cannot be determined"], correctAnswer: "It depends on the definition of sound" },
+		{ question: "A man gives a woman 5 coins. How many coins does the woman have after she gives 2 coins back to the man?", choices: ["5", "7", "3", "2"], correctAnswer: "3" },
+		{ question: "If you rearrange the letters 'CIFAIPC' you would have the name of which ocean?", choices: ["Atlantic", "Pacific", "Indian", "Arctic"], correctAnswer: "Pacific" },
+		{ question: "A plane crashes on the border of the United States and Canada. Where do they bury the survivors?", choices: ["United States", "Canada", "Nowhere", "Both countries"], correctAnswer: "Nowhere" },
+		{ question: "If you had a 10-liter bucket and a 7-liter bucket, how would you measure exactly 6 liters of water?", choices: ["Fill the 7-liter bucket twice", "Fill the 10-liter bucket and then pour into the 7-liter bucket", "Fill the 10-liter bucket and then remove 4 liters", "There is no way to measure 6 liters"], correctAnswer: "Fill the 10-liter bucket and then pour into the 7-liter bucket until full, leaving exactly 3 liters in the 10-liter bucket. Then pour out the 7-liter bucket and pour the remaining 3 liters into it. Fill the 10-liter bucket again, and then pour water into the 7-liter bucket until it is full, leaving exactly 6 liters in the 10-liter bucket." },
+		{ question: "A father and his son are in a car accident. The father dies at the scene, and the son is taken to the hospital. When the surgeon sees the boy, the surgeon says, 'I can't operate on this boy; he's my son.' How is this possible?", choices: ["The surgeon is the boy's father", "The surgeon is the boy's mother", "The boy has two fathers", "The boy is adopted"], correctAnswer: "The surgeon is the boy's mother" }
+
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const question = questions[currentQuestionIndex];
+        document.getElementById("question-text").textContent = question.question;
+        const choicesList = document.getElementById("choices-list");
+        choicesList.innerHTML = "";
+
+        question.choices.forEach(choice => {
+            const li = document.createElement("li");
+            li.textContent = choice;
+            li.onclick = () => checkAnswer(choice);
+            choicesList.appendChild(li);
+        });
+    }
+
+    function checkAnswer(selectedChoice) {
+        const question = questions[currentQuestionIndex];
+        if (selectedChoice === question.correctAnswer) {
+            score++;
+        }
+        // Move to the next question immediately after selection
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById("quiz-container").style.display = "none";
+        document.getElementById("result-page").style.display = "block";
+
+        // Improved IQ calculation: 
+        // Assume each correct answer is worth 5 IQ points, with a base of 70 IQ
+        // We scale it up to ensure the maximum IQ score is 140 for perfect answers
+        const estimatedIQ = Math.min(140, 70 + (score * (140 - 70) / questions.length));
+        
+        document.getElementById("score").textContent = `Your score: ${score} / ${questions.length}`;
+        document.getElementById("estimated-IQ").textContent = `Estimated IQ: ${Math.round(estimatedIQ)}`;
+    }
+
+    function goBack() {
+        document.getElementById("quiz-container").style.display = "block";
+        document.getElementById("result-page").style.display = "none";
+        currentQuestionIndex = 0;
+        score = 0;
+        loadQuestion();
+    }
+
+    // Initializing the quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>
